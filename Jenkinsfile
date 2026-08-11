@@ -41,15 +41,39 @@ pipeline {
                 }
             }
         }
+
+        stage('Terraform Apply') {
+            when {
+                branch 'main'
+            }
+
+            steps {
+                echo 'Applying Terraform changes to Azure...'
+
+                withCredentials([
+                    string(credentialsId: 'azure-client-id', variable: 'ARM_CLIENT_ID'),
+                    string(credentialsId: 'azure-client-secret', variable: 'ARM_CLIENT_SECRET'),
+                    string(credentialsId: 'azure-tenant-id', variable: 'ARM_TENANT_ID'),
+                    string(credentialsId: 'azure-subscription-id', variable: 'ARM_SUBSCRIPTION_ID')
+                ]) {
+                    sh '''
+                        terraform apply \
+                        -input=false \
+                        -auto-approve \
+                        -var="subscription_id=$ARM_SUBSCRIPTION_ID"
+                    '''
+                }
+            }
+        }
     }
 
     post {
         success {
-            echo 'Terraform CI Pipeline completed successfully!'
+            echo 'Terraform CI/CD Pipeline completed successfully!'
         }
 
         failure {
-            echo 'Terraform CI Pipeline failed!'
+            echo 'Terraform CI/CD Pipeline failed!'
         }
     }
 }
