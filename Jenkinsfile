@@ -23,12 +23,16 @@ pipeline {
             }
         }
 
-        stage('Terraform Plan') {
-            steps {
-                echo 'Creating Terraform plan...'
-                sh 'terraform plan -input=false'
-            }
-        }
+      stage('Terraform Plan') {
+    steps {
+        echo 'Creating Terraform plan...'
+        sh '''
+            terraform plan \
+              -input=false \
+              -var="subscription_id=$(az account show --query id -o tsv)"
+        '''
+    }
+}
     }
 
     post {
