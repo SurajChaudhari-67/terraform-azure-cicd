@@ -43,9 +43,7 @@ pipeline {
         }
 
         stage('Terraform Apply') {
-            when {
-                branch 'main'
-            }
+            
 
             steps {
                 echo 'Applying Terraform changes to Azure...'
